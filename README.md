@@ -16,23 +16,7 @@ sudo pacman -S nasm qemu gcc-multilib
 
 BUILD INSTRUCTIONS:
 --------------------------
-1. Assemble the bootloader:
-nasm -f bin boot.asm -o boot.bin
-
-2. Compile the kernel:
-gcc -ffreestanding -c kernel.c -o kernel.o
-ld -o kernel.bin -Ttext 0x1000 kernel.o --oformat binary
-
-3. Combine the binaries:
-cat boot.bin kernel.bin > os.bin
-
-4. Run in QEMU:
-qemu-system-x86_64 -fda os.bin
-
-Expected Output:
----------------
-- "Hello, OS World!" message
-- 'X' character in top-left corner
+sh build.sh
 
 Learning Concepts:
 -----------------
