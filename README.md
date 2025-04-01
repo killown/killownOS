@@ -14,48 +14,46 @@ Requirements (Arch Linux):
 Install dependencies:
 sudo pacman -S nasm qemu gcc-multilib
 
-Build Instructions:
-------------------
-1. Assemble bootloader:
+BUILD INSTRUCTIONS:
+--------------------------
+1. Assemble the bootloader:
 nasm -f bin boot.asm -o boot.bin
 
-2. Compile kernel:
-gcc -m32 -ffreestanding -nostdlib -c kernel.c -o kernel.o
-ld -m elf_i386 -Ttext 0x1000 -nostdlib kernel.o -o kernel.bin
+2. Compile the kernel:
+gcc -ffreestanding -c kernel.c -o kernel.o
+ld -o kernel.bin -Ttext 0x1000 kernel.o --oformat binary
 
-3. Combine binaries:
-cat boot.bin kernel.bin > KillownOS.bin
+3. Combine the binaries:
+cat boot.bin kernel.bin > os.bin
 
-Run in QEMU:
------------
-qemu-system-x86_64 -drive format=raw,file=KillownOS.bin
+4. Run in QEMU:
+qemu-system-x86_64 -fda os.bin
+
+ALTERNATIVE MAKEFILE:
+--------------------
+all: os.bin
+
+boot.bin: boot.asm
+	nasm -f bin $< -o $@
+
+kernel.bin: kernel.c
+	gcc -ffreestanding -c $< -o kernel.o
+	ld -o $@ -Ttext 0x1000 kernel.o --oformat binary
+
+os.bin: boot.bin kernel.bin
+	cat $^ > $@
+
+run: os.bin
+	qemu-system-x86_64 -fda $<
+
+clean:
+	rm -f *.bin *.o
+
 
 Expected Output:
 ---------------
 - "Hello, OS World!" message
 - 'X' character in top-left corner
-
-Makefile Contents:
------------------
-all: KillownOS.bin
-
-boot.bin: boot.asm
-	nasm -f bin $< -o $@
-
-kernel.o: kernel.c
-	gcc -m32 -ffreestanding -nostdlib -c $< -o $@
-
-kernel.bin: kernel.o
-	ld -m elf_i386 -Ttext 0x1000 -nostdlib $< -o $@
-
-KillownOS.bin: boot.bin kernel.bin
-	cat $^ > $@
-
-run: KillownOS.bin
-	qemu-system-x86_64 -drive format=raw,file=$<
-
-clean:
-	rm -f *.bin *.o
 
 Learning Concepts:
 -----------------
