@@ -29,27 +29,6 @@ cat boot.bin kernel.bin > os.bin
 4. Run in QEMU:
 qemu-system-x86_64 -fda os.bin
 
-ALTERNATIVE MAKEFILE:
---------------------
-all: os.bin
-
-boot.bin: boot.asm
-	nasm -f bin $< -o $@
-
-kernel.bin: kernel.c
-	gcc -ffreestanding -c $< -o kernel.o
-	ld -o $@ -Ttext 0x1000 kernel.o --oformat binary
-
-os.bin: boot.bin kernel.bin
-	cat $^ > $@
-
-run: os.bin
-	qemu-system-x86_64 -fda $<
-
-clean:
-	rm -f *.bin *.o
-
-
 Expected Output:
 ---------------
 - "Hello, OS World!" message
